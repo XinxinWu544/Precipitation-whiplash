@@ -1,4 +1,4 @@
-# Precipitation-whiplash
+# Precipitation whiplash
 ## Increasing global precipitation whiplash due to anthropogenic greenhouse gas emissions
 
 Supporting code for  'Increasing global precipitation whiplash due to anthropogenic greenhouse gas emissions' 
