@@ -7,7 +7,7 @@ If you find meaningful errors in the code of have questions, please contact Xinx
 
 ## NOTE
 The fully reproducible part starts from 4-1 (need to download the processed data of 3-2).
-Thus we provide a DEMO to simply reproduce how we calculate the whiplash and its features (See folder Demo).
+Thus we provide a DEMO to simply reproduce how we calculate the whiplash and its features (similar to part of scripts in 2-1 & 3-1; See folder Demo).
 
 ## Organization of repository ##
 python scripts to read and analyze data, and create figures:  
