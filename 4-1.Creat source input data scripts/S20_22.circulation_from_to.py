@@ -1,0 +1,105 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Feb 16 22:17:01 2023
+
+@author: dai
+"""
+
+import numpy as np
+import xarray as xr
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
+from matplotlib.ticker import MultipleLocator, FormatStrFormatter
+import scipy
+from scipy import signal  
+import os
+from datetime import datetime
+import pandas as pd
+from cartopy.util import add_cyclic_point
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
+import cartopy.io.shapereader as shpreader
+import tqdm
+import multiprocessing
+import gc
+from matplotlib.colors import ListedColormap, BoundaryNorm # for user-defined colorbars on matplotlib
+
+basic_dir='/media/dai/disk2/suk/research/4.East_Asia/Again/'
+#basic_loc = 'E:'
+#%%
+num=[np.linspace(1,35,35).astype(int)]
+num.append(np.linspace(101,105,5).astype(int))
+num=[j for i in num for j in i]
+
+interval=[(1,5),(1,10),(1,15),(1,20),(1,25),(1,30)]
+
+k=5
+region='northeastern-china'
+
+lon1=120 - 30
+lon2=130 + 30
+lat1=40 - 25
+lat2=50 + 25    
+
+d='dmean'
+period = ['current','future']
+states = ['before','transition','after']
+
+x=21
+#%%
+circulation={}
+
+for whiplash_type in ['dry_to_wet','wet_to_dry']:
+
+    
+    for p in [0,1]:
+        for i in [0,2]:
+        
+            for k in [5,4,3,2,1,0]:
+           
+                uq = np.load(basic_dir+'code_whiplash/3-2.Processed data from analysis/7-2.current_future_circulation/plan'+str(x)+'_Anomalies_IVT_UQ_'+d+'_'+states[i]+'_'+period[p]+'.npy',allow_pickle=True).tolist()
+                vq = np.load(basic_dir+'code_whiplash/3-2.Processed data from analysis/7-2.current_future_circulation/plan'+str(x)+'_Anomalies_IVT_VQ_'+d+'_'+states[i]+'_'+period[p]+'.npy',allow_pickle=True).tolist()
+                z = np.load(basic_dir+'code_whiplash/3-2.Processed data from analysis/7-2.current_future_circulation/plan'+str(x)+'_Z500_'+d+'_'+states[i]+'_'+period[p]+'.npy',allow_pickle=True).tolist()
+               
+                UQ=[]
+                for n in num:
+                    
+                    if states[i] == 'transition':
+                        new = uq.get(str(n)+'~'+whiplash_type)
+                    else:
+                        new = uq.get(str(n)+'~'+str(k)+'~'+whiplash_type)
+                    if n>1 :
+                        new = new.assign_coords({'lat':UQ[0].lat})
+                    UQ.append(new)
+                UQ = xr.concat(UQ, pd.Index(num, name='ensemble') ).mean('ensemble').sel(lon=slice(lon1,lon2),lat=slice(lat2,lat1))
+                    
+                VQ=[]
+                for n in num:
+                    if states[i] == 'transition':
+                        new = vq.get(str(n)+'~'+whiplash_type)
+                    else:
+                        new = vq.get(str(n)+'~'+str(k)+'~'+whiplash_type)
+                    if n>1 :
+                        new = new.assign_coords({'lat':VQ[0].lat})
+                    VQ.append(new)    
+                VQ = xr.concat(VQ, pd.Index(num, name='ensemble') ).mean('ensemble').sel(lon=slice(lon1,lon2),lat=slice(lat2,lat1))
+                    
+                Z=[]
+                for n in num:
+                    if states[i] == 'transition':
+                        new = z.get(str(n)+'~'+whiplash_type)
+                    else:
+                        new = z.get(str(n)+'~'+str(k)+'~'+whiplash_type)
+                    if n>1 :
+                        new = new.assign_coords({'lat':Z[0].lat})
+                    Z.append(new)    
+                Z = xr.concat(Z, pd.Index(num, name='ensemble') ).mean('ensemble').sel(lon=slice(lon1,lon2),lat=slice(lat2,lat1))
+    
+                circulation.update({str(k)+'_Z_'+states[i]+'_'+period[p]+'_'+whiplash_type:Z})
+                circulation.update({str(k)+'_VQ_'+states[i]+'_'+period[p]+'_'+whiplash_type:VQ})
+                circulation.update({str(k)+'_UQ_'+states[i]+'_'+period[p]+'_'+whiplash_type:UQ})
+            
+
+
+np.save(basic_dir+'code_whiplash/4-2.Input data for plotting/S21_22.circulation_from_to.npy',circulation)
