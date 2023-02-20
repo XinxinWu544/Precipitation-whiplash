@@ -6,7 +6,7 @@ Supporting code for  'Increasing global precipitation whiplash due to anthropoge
 If you find meaningful errors in the code of have questions, please contact Xinxin WU [wuxx26@mail2.sysu.edu.cn]
 
 ## NOTE
-The fully reproducible part starts from 4-1 (need to download the processed data of 3-2).
+The fully reproducible part starts from 4-1 (need to download the processed data of 3-2 [https://zenodo.org/record/7654618#.Y_MNO3ZBxPY]).
 Thus we provide a DEMO to simply reproduce how we calculate the whiplash and its features (similar to part of scripts in 2-1 & 3-1; See folder Demo).
 
 ## Organization of repository ##
